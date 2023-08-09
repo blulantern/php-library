@@ -1,0 +1,19 @@
+{
+    "name": "blulantern/phplibrary",
+    "description": "Blulantern PHP Library",
+    "require": {
+        "phpunit/phpunit": "^10.3",
+        "symfony/symfony": "^6.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Blulantern\\Phplibrary\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "John T Fox",
+            "email": "jfox@blulantern.com"
+        }
+    ]
+}

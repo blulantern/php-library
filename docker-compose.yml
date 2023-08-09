@@ -1,45 +1,27 @@
 version: '3'
 services:
   #PHP Service
-  php-library:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: php:7.4.5
-    container_name: php-library
+  php:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    image: php:fpm-alpine
+    container_name: php
     restart: unless-stopped
     tty: true
     environment:
-      SERVICE_NAME: php-library
+      SERVICE_NAME: php
       SERVICE_TAGS: dev
     working_dir: /var/www
     volumes:
       - ./:/var/www
     networks:
-      - php-library-network
-
-  #Nginx Service
-  php-library-webserver:
-    image: nginx:alpine
-    container_name: php-library-webserver
-    restart: unless-stopped
-    tty: true
-    ports:
-      - "8001:80"
-      - "443:443"
-    volumes:
-      - ./:/var/www
-      - ./docker-compose/nginx/default.conf:/etc/nginx/conf.d/default.conf
-    networks:
-      - php-library-network
-    depends_on:
-      - php-library
-      - php-library-db
+      - php-network
  
   #MySQL Service
-  php-library-db:
+  db:
     image: percona:latest
-    container_name: php-library-db
+    container_name: db
     restart: unless-stopped
     tty: true
     ports:
@@ -50,11 +32,27 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_USER: ${DB_USERNAME}
       SERVICE_TAGS: dev
-      SERVICE_NAME: php-library-db
+      SERVICE_NAME: db
     networks:
-      - php-library-network
-
+      - php-network
+  #Nginx Service
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www
+      - ./docker-compose/nginx/:/etc/nginx/conf.d/
+    networks:
+      - php-network
+    depends_on:
+      - php
+      - db
 #Docker Networks
 networks:
-  php-library-network:
+  php-network:
     driver: bridge
